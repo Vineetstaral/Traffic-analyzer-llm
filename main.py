@@ -1,10 +1,8 @@
 import os
-import cv2
 import streamlit as st
 from groq import Groq
 from ultralytics import YOLO
 from PIL import Image
-import numpy as np
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -27,26 +25,20 @@ VEHICLE_CLASSES = {
 }
 
 def analyze_traffic(image):
-    """Process image and return vehicle counts"""
-    # Convert PIL to OpenCV format
-    img_array = np.array(image)
-    img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+    """Process image using pure PIL"""
+    # Run detection directly on PIL Image
+    results = services['model'](image)
     
-    # Run detection
-    results = services['model'](img_cv)
-    
-    # Count vehicles
+    # Count vehicles and generate annotation
     counts = {v:0 for v in VEHICLE_CLASSES.values()}
+    annotated_img = image.copy()
+    
     for box in results[0].boxes:
         class_id = int(box.cls)
         if class_id in VEHICLE_CLASSES:
             counts[VEHICLE_CLASSES[class_id]] += 1
     
-    # Generate annotated image
-    annotated_img = results[0].plot()
-    annotated_img = cv2.cvtColor(annotated_img, cv2.COLOR_BGR2RGB)
-    
-    return counts, Image.fromarray(annotated_img)
+    return counts, results[0].plot()  # plot() returns PIL Image
 
 def generate_report(counts):
     """Generate traffic analysis summary"""
@@ -60,7 +52,6 @@ def generate_report(counts):
     1. Traffic density assessment
     2. Dominant vehicle types
     3. Potential bottlenecks
-    4. Safety recommendations
     """
     
     response = services['llm'].chat.completions.create(
@@ -96,6 +87,3 @@ if uploaded_file:
         
         st.subheader("Traffic Report")
         st.write(report)
-        
-        st.subheader("Vehicle Counts")
-        st.bar_chart(counts)
