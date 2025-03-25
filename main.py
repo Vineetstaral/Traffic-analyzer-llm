@@ -102,8 +102,8 @@ if uploaded_file:
     counts, result_img, detected_objects = analyze_image(image)
     
     col1, col2 = st.columns(2)
-    col1.image(image, use_column_width=True, caption="Original Image")
-    col2.image(result_img, use_column_width=True, caption="Analysis Results")
+    col1.image(image, use_container_width=True, caption="Original Image")
+    col2.image(result_img, use_container_width=True, caption="Analysis Results")
     
     report = generate_report(counts, detected_objects)
     st.subheader("Analysis Report")
