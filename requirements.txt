@@ -1,0 +1,6 @@
+ultralytics 
+supervision 
+groq 
+python-dotenv 
+pandas 
+opencv-python
