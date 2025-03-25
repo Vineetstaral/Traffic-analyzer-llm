@@ -1,6 +1,6 @@
-ultralytics 
-supervision 
-groq 
-python-dotenv 
-pandas 
+streamlit
+groq
+ultralytics
+python-dotenv
 opencv-python
+Pillow
